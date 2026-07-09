@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="LegendaViva — acessibilidade em tempo real. Apresentação do Grupo 9.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>">
+<title>LegendaViva — Apresentação</title>
+
+<style>
+  @property --sweep{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+
+  :root{
+    --ink:#0A0C0F; --ink-2:#0E1216; --surface:#151A21; --surface-2:#1C2530;
+    --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.055);
+    --text:#F5F7F9; --muted:#98A4B0; --dim:#67747F;
+    --cap:#F4C740; --cap-2:#FFD75E; --cap-soft:rgba(244,199,64,.12); --cap-line:rgba(244,199,64,.34);
+    --cyan:#4CC9D6; --cyan-soft:rgba(76,201,214,.11);
+    --good:#54D98C; --warn:#F2B14B; --bad:#F2766B;
+    --r:16px;
+    --shadow:0 24px 60px -28px rgba(0,0,0,.7), 0 2px 0 rgba(255,255,255,.02) inset;
+    --f-sans:"Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    --f-mono:"Cascadia Code",ui-monospace,"SFMono-Regular",Consolas,monospace;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--ink); color:var(--text);
+    font-family:var(--f-sans); overflow:hidden; position:relative;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  /* fine film grain — cutting-edge subtle texture, cheap & static */
+  body::after{
+    content:""; position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- deck shell ---------- */
+  #deck{position:fixed; inset:0; overflow:hidden; cursor:pointer;}
+  .slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:clamp(28px,5vw,96px);
+    opacity:0; visibility:hidden; transform:scale(1.012);
+    transition:opacity .55s var(--ease), transform .7s var(--ease), visibility .55s;
+    background:
+      radial-gradient(1300px 760px at 84% -12%, rgba(76,201,214,.08), transparent 58%),
+      radial-gradient(1100px 640px at -6% 112%, rgba(244,199,64,.07), transparent 55%),
+      var(--ink);
+  }
+  .slide.active{opacity:1; visibility:visible; transform:none;}
+  .slide.past{transform:scale(.99);}
+  .slide__inner{width:100%; max-width:1120px; margin:0 auto;}
+
+  /* staggered reveal of each top-level block */
+  .slide__inner>*{opacity:0; transform:translateY(22px); filter:blur(2px);
+    transition:opacity .6s var(--ease), transform .6s var(--ease), filter .6s var(--ease);}
+  .slide.active .slide__inner>*{opacity:1; transform:none; filter:none;}
+  .slide.active .slide__inner>*:nth-child(1){transition-delay:.10s}
+  .slide.active .slide__inner>*:nth-child(2){transition-delay:.18s}
+  .slide.active .slide__inner>*:nth-child(3){transition-delay:.26s}
+  .slide.active .slide__inner>*:nth-child(4){transition-delay:.34s}
+  .slide.active .slide__inner>*:nth-child(5){transition-delay:.42s}
+
+  @media (prefers-reduced-motion:reduce){
+    .slide{transition:opacity .2s, visibility .2s; transform:none!important}
+    .slide__inner>*{transition:none; opacity:1; transform:none; filter:none}
+  }
+
+  /* ---------- typography ---------- */
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:.6em;
+    font-size:clamp(11px,1.15vw,13px); font-weight:700;
+    letter-spacing:.24em; text-transform:uppercase; color:var(--cap);
+    margin-bottom:clamp(16px,2.4vw,26px);
+  }
+  .eyebrow::before{content:""; width:28px; height:2px; background:var(--cap); border-radius:2px; box-shadow:0 0 12px var(--cap-line);}
+  .eyebrow.cy{color:var(--cyan)} .eyebrow.cy::before{background:var(--cyan); box-shadow:0 0 12px rgba(76,201,214,.5)}
+  h1{font-size:clamp(40px,7.8vw,108px); line-height:.96; letter-spacing:-.035em; font-weight:800; text-wrap:balance;}
+  h2{font-size:clamp(28px,4.7vw,60px); line-height:1.01; letter-spacing:-.022em; font-weight:800; text-wrap:balance;}
+  .lead{font-size:clamp(16px,2.05vw,23px); line-height:1.5; color:var(--muted); max-width:60ch; margin-top:clamp(14px,2vw,22px);}
+  .kicker{font-size:clamp(15px,1.7vw,19px); color:var(--text); line-height:1.5;}
+  p{text-wrap:pretty}
+
+  /* ---------- caption motif ---------- */
+  .caption-bar{
+    display:inline-block; background:rgba(0,0,0,.5); backdrop-filter:blur(6px);
+    border-left:4px solid var(--cap); border-radius:5px;
+    padding:.55em .85em; color:#fff; font-weight:600;
+    font-size:clamp(15px,2vw,23px); line-height:1.35; min-height:1.35em;
+    box-shadow:0 10px 30px -14px rgba(0,0,0,.8);
+  }
+  .caption-bar .cap-y{color:var(--cap)}
+  #typed{white-space:pre-wrap}
+  .cursor{display:inline-block; width:.52ch; height:1.05em; vertical-align:-.14em;
+    background:var(--cap); margin-left:.12em; box-shadow:0 0 10px var(--cap-line);
+    animation:blink 1.05s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+
+  /* ---------- layout utils ---------- */
+  .grid{display:grid; gap:clamp(14px,1.8vw,20px);}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:820px){.g4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:680px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .mt{margin-top:clamp(22px,3.4vw,40px)} .mt-s{margin-top:clamp(14px,2vw,20px)}
+
+  .card{
+    background:linear-gradient(180deg,var(--surface),var(--ink-2));
+    border:1px solid var(--line); border-radius:var(--r);
+    padding:clamp(16px,2vw,24px); box-shadow:var(--shadow);
+    transition:transform .35s var(--ease), border-color .35s var(--ease);
+  }
+  .slide.active .card:hover{transform:translateY(-3px); border-color:var(--cap-line)}
+  .card h3{font-size:clamp(15px,1.55vw,18px); font-weight:700; letter-spacing:-.01em; margin-bottom:6px;}
+  .card p{font-size:clamp(13px,1.35vw,15px); color:var(--muted); line-height:1.5;}
+  .card p b{color:var(--text)}
+  .card .ico{font-size:22px; margin-bottom:12px; display:block; filter:saturate(1.1)}
+
+  .stat{position:relative; overflow:hidden; background:linear-gradient(180deg,var(--surface),var(--ink-2));
+    border:1px solid var(--line); border-radius:var(--r); padding:clamp(18px,2.2vw,26px); box-shadow:var(--shadow);}
+  .stat::before{content:""; position:absolute; left:0; top:0; height:100%; width:3px; background:var(--cap); opacity:.5}
+  .stat.cy::before{background:var(--cyan)} .stat.good::before{background:var(--good)}
+  .stat .num{font-size:clamp(30px,4.6vw,52px); font-weight:800; letter-spacing:-.035em; line-height:1; font-variant-numeric:tabular-nums;}
+  .stat .num.cap{color:var(--cap)} .stat .num.cy{color:var(--cyan)} .stat .num.gd{color:var(--good)}
+  .stat .lbl{margin-top:10px; font-size:clamp(12px,1.3vw,14px); color:var(--muted); line-height:1.4;}
+
+  ul.clean{list-style:none; display:flex; flex-direction:column; gap:clamp(10px,1.4vw,15px);}
+  ul.clean li{display:flex; gap:.7em; align-items:flex-start; font-size:clamp(14px,1.6vw,18px); line-height:1.45; color:var(--text);}
+  ul.clean li .mk{color:var(--cap); font-weight:800; flex:none; margin-top:.02em}
+  ul.clean li.cy .mk{color:var(--cyan)}
+  ul.clean li .sub{color:var(--muted); font-weight:400}
+  ul.clean li b{font-weight:700}
+
+  .pill{display:inline-flex; align-items:center; gap:.5em; padding:.42em .85em; border-radius:999px;
+    font-size:clamp(12px,1.3vw,14px); font-weight:600; border:1px solid var(--line);
+    background:var(--surface); box-shadow:0 6px 18px -12px rgba(0,0,0,.8);}
+  .pill .dot{width:8px; height:8px; border-radius:50%; background:var(--good); box-shadow:0 0 0 0 rgba(84,217,140,.5); animation:pulse 2.4s var(--ease) infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(84,217,140,.45)}70%{box-shadow:0 0 0 9px rgba(84,217,140,0)}100%{box-shadow:0 0 0 0 rgba(84,217,140,0)}}
+  @media (prefers-reduced-motion:reduce){.pill .dot{animation:none}}
+  .pill.cap{border-color:var(--cap-line); background:var(--cap-soft); color:var(--cap)}
+  .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+
+  .tag{font-family:var(--f-mono); font-size:clamp(11px,1.2vw,13px); color:var(--muted);
+    background:var(--ink-2); border:1px solid var(--line); border-radius:8px; padding:.4em .65em;}
+
+  .note{border-left:3px solid var(--cyan); background:var(--cyan-soft); border-radius:0 10px 10px 0;
+    padding:clamp(12px,1.6vw,16px) clamp(14px,1.8vw,20px); font-size:clamp(13px,1.45vw,16px); line-height:1.5; color:var(--text);}
+  .note b{color:var(--cyan)}
+
+  /* architecture flow */
+  .flow{display:flex; align-items:stretch; gap:12px; flex-wrap:wrap}
+  .node{flex:1 1 150px; background:linear-gradient(180deg,var(--surface),var(--ink-2));
+    border:1px solid var(--line); border-radius:12px; padding:14px 16px; min-width:140px; box-shadow:var(--shadow)}
+  .node .nt{font-size:clamp(13px,1.4vw,15px); font-weight:700}
+  .node .nd{font-size:clamp(11px,1.2vw,13px); color:var(--muted); margin-top:4px; line-height:1.4}
+  .node.k{border-color:var(--cap-line)} .node.k .nt{color:var(--cap)}
+  .node.c{border-color:rgba(76,201,214,.4)} .node.c .nt{color:var(--cyan)}
+  .arrow{align-self:center; color:var(--dim); font-size:22px; flex:none}
+  @media(max-width:680px){.arrow{transform:rotate(90deg)}}
+
+  /* ---------- chrome ---------- */
+  #progress{position:fixed; top:0; left:0; height:3px; z-index:40; width:0;
+    background:linear-gradient(90deg,var(--cap),var(--cap-2));
+    transition:width .55s var(--ease); box-shadow:0 0 14px var(--cap-line);}
+  .chrome{position:fixed; z-index:41; display:flex; align-items:center; gap:12px; color:var(--muted);}
+  #botright{right:clamp(16px,3vw,34px); bottom:clamp(14px,2.6vw,26px);
+    background:rgba(12,15,19,.55); backdrop-filter:blur(10px); border:1px solid var(--line-2);
+    border-radius:14px; padding:7px 8px 7px 14px;}
+  #botleft{left:clamp(16px,3vw,34px); bottom:clamp(14px,2.6vw,26px); font-size:12px; letter-spacing:.03em}
+  .counter{font-family:var(--f-mono); font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .counter b{color:var(--text)}
+  .nav{display:flex; gap:8px}
+  .nav button{width:38px; height:38px; border-radius:10px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text); font-size:17px; cursor:pointer;
+    display:grid; place-items:center; transition:background .15s, border-color .15s, transform .15s;}
+  .nav button:hover{background:var(--surface-2); border-color:var(--cap-line)}
+  .nav button:active{transform:scale(.92)}
+  .nav button:focus-visible{outline:2px solid var(--cap); outline-offset:2px}
+  .hint{opacity:.78}
+  .kbd{font-family:var(--f-mono); font-size:11px; border:1px solid var(--line); border-bottom-width:2px;
+    border-radius:5px; padding:1px 6px; color:var(--text); background:var(--ink-2)}
+  #brand{position:fixed; top:clamp(14px,2.6vw,26px); left:clamp(16px,3vw,34px); z-index:41;
+    font-weight:800; letter-spacing:-.02em; font-size:15px; display:flex; align-items:center; gap:9px; color:var(--text)}
+  #brand .sq{width:15px; height:15px; border-radius:4px; position:relative;
+    background:conic-gradient(from var(--sweep), var(--cap), var(--cap-2), var(--cyan), var(--cap));
+    box-shadow:0 0 14px var(--cap-line); animation:spin 7s linear infinite;}
+  @keyframes spin{to{--sweep:360deg}}
+  @media (prefers-reduced-motion:reduce){#brand .sq{animation:none; background:var(--cap)}}
+  #brand small{color:var(--muted); font-weight:600}
+
+  @media(max-width:620px){#brand small,.hint{display:none}}
+
+  /* ---------- cinematic intro (Cypheir-style fly-through) ---------- */
+  #intro{position:fixed; inset:0; z-index:55; background:#04060A; cursor:pointer;
+    opacity:1; transition:opacity .8s var(--ease);}
+  #intro.out{opacity:0; pointer-events:none}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="brand"><span class="sq"></span>LegendaViva <small>· Grupo 9</small></div>
+
+<div id="deck">
+
+  <!-- 01 CAPA -->
+  <section class="slide" data-title="Capa">
+    <div class="slide__inner">
+      <div class="eyebrow">Acessibilidade em tempo real</div>
+      <h1>Legenda<span style="color:var(--cap)">Viva</span></h1>
+      <p class="lead">Transforma fala em legenda ao vivo — e em Libras — direto no navegador. Sem instalar. Sem login. A audiência só abre o link.</p>
+      <div class="mt">
+        <span class="caption-bar"><span id="typed"></span><span class="cursor"></span></span>
+      </div>
+      <div class="row mt">
+        <span class="pill"><span class="dot"></span>No ar em produção</span>
+        <span class="tag">legendaviva-ifrn.duckdns.org</span>
+        <span class="tag">Grupo 9 · Eng. de Software com IA</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 PROBLEMA -->
+  <section class="slide" data-title="O Problema">
+    <div class="slide__inner">
+      <div class="eyebrow">O problema</div>
+      <h2>Eventos ao vivo excluem quem não ouve.</h2>
+      <p class="lead">Palestras, aulas e reuniões acontecem no momento — e quase nunca têm legenda ao vivo. Quem não ouve fica de fora da conversa.</p>
+      <div class="grid g3 mt">
+        <div class="stat"><div class="num cap">~10 mi</div><div class="lbl">brasileiros com algum grau de deficiência auditiva</div></div>
+        <div class="stat"><div class="num">Ao vivo</div><div class="lbl">o conteúdo falado se perde na hora — não dá para "ler depois" uma aula que já passou</div></div>
+        <div class="stat cy"><div class="num cy">0</div><div class="lbl">solução instantânea que a própria audiência abre no celular</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 SOLUÇÃO -->
+  <section class="slide" data-title="A Solução">
+    <div class="slide__inner">
+      <div class="eyebrow">A solução</div>
+      <h2>Um link. Legenda ao vivo para todo mundo.</h2>
+      <div class="grid g2 mt">
+        <ul class="clean">
+          <li><span class="mk">▹</span><span><b>Palestrante</b> abre o painel e fala — a transcrição aparece em tempo real. <span class="sub">Web Speech API no navegador.</span></span></li>
+          <li><span class="mk">▹</span><span><b>Audiência</b> escaneia o QR e lê no celular. <span class="sub">Mobile-first, alto contraste, fonte de 16 a 48px.</span></span></li>
+          <li class="cy"><span class="mk">▹</span><span><b>Libras ao vivo</b> com o avatar oficial VLibras. <span class="sub">Para quem tem Libras como primeira língua.</span></span></li>
+        </ul>
+        <ul class="clean">
+          <li><span class="mk">▹</span><span>Palavras-chave em destaque <span class="sub">(termos técnicos da palestra).</span></span></li>
+          <li><span class="mk">▹</span><span>Tradução simultânea <span class="sub">PT ↔ EN ↔ ES.</span></span></li>
+          <li><span class="mk">▹</span><span>Modo karaokê + rolagem inteligente <span class="sub">para acompanhar sem se perder.</span></span></li>
+          <li><span class="mk">▹</span><span>Exportar a transcrição em <span class="tag">.txt</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 DEMO -->
+  <section class="slide" data-title="Demonstração">
+    <div class="slide__inner">
+      <div class="eyebrow cy">Demonstração ao vivo</div>
+      <h2>Vamos ver funcionando.</h2>
+      <p class="lead">Roteiro de 3 minutos — abrir o app já em produção, com HTTPS.</p>
+      <div class="grid g4 mt">
+        <div class="card"><span class="ico">🎙️</span><h3>1 · Criar sessão</h3><p>Título + idioma + palavras-chave. Gera link e QR.</p></div>
+        <div class="card"><span class="ico">📱</span><h3>2 · Entrar como audiência</h3><p>Escanear o QR no celular — sem login.</p></div>
+        <div class="card"><span class="ico">💬</span><h3>3 · Falar</h3><p>A legenda aparece no palco e no celular em segundos.</p></div>
+        <div class="card"><span class="ico">🤟</span><h3>4 · Ligar Libras</h3><p>Ativar o avatar VLibras na tela da audiência.</p></div>
+      </div>
+      <div class="row mt">
+        <span class="pill cap">▶ legendaviva-ifrn.duckdns.org</span>
+        <span class="hint" style="color:var(--muted)">Palestrante em Chrome/Edge · liberar o microfone na 1ª vez</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 ARQUITETURA -->
+  <section class="slide" data-title="Arquitetura">
+    <div class="slide__inner">
+      <div class="eyebrow">Arquitetura &amp; decisões técnicas</div>
+      <h2>Tempo real, mesma origem, sem atrito.</h2>
+      <div class="flow mt">
+        <div class="node k"><div class="nt">Palestrante</div><div class="nd">mic + Speech-to-Text no navegador</div></div>
+        <span class="arrow">→</span>
+        <div class="node"><div class="nt">Frontend React</div><div class="nd">Vite + MUI + Zustand</div></div>
+        <span class="arrow">→</span>
+        <div class="node c"><div class="nt">FastAPI</div><div class="nd">sessões + WebSocket broadcast</div></div>
+        <span class="arrow">→</span>
+        <div class="node k"><div class="nt">Audiência</div><div class="nd">legenda + Libras no celular</div></div>
+      </div>
+      <div class="grid g3 mt">
+        <div class="card"><h3>Por que WebSocket</h3><p>Broadcast de baixa latência do palco para muitos celulares ao mesmo tempo.</p></div>
+        <div class="card"><h3>Por que STT no cliente</h3><p>Sem enviar áudio ao servidor: mais privado (áudio não é armazenado) e mais barato.</p></div>
+        <div class="card"><h3>Por que uma origem só</h3><p>FastAPI serve o SPA atrás do Caddy/HTTPS — sem CORS, deploy simples no VPS.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 O MOTOR -->
+  <section class="slide" data-title="O Motor">
+    <div class="slide__inner">
+      <div class="eyebrow">O motor do projeto</div>
+      <h2>Uma esteira de tempo real, do palco ao celular.</h2>
+      <div class="flow mt">
+        <div class="node k">
+          <div class="nt">1 · Captura</div>
+          <div class="nd"><b>Web Speech API</b> no navegador do palestrante: fala → texto ao vivo. O áudio nunca sai do dispositivo.</div>
+        </div>
+        <span class="arrow">→</span>
+        <div class="node c">
+          <div class="nt">2 · Distribuição</div>
+          <div class="nd"><b>FastAPI + WebSocket</b>: cada frase é transmitida em broadcast para todos os celulares da sessão, ao mesmo tempo.</div>
+        </div>
+        <span class="arrow">→</span>
+        <div class="node k">
+          <div class="nt">3 · Sinalização</div>
+          <div class="nd"><b>VLibras por código</b>: as frases finalizadas alimentam o avatar, que sinaliza em Libras na tela da audiência.</div>
+        </div>
+      </div>
+      <div class="grid g3 mt">
+        <div class="card"><h3>Client-side por decisão</h3><p>Reconhecer a voz no navegador = privacidade (áudio não é armazenado) e custo zero de servidor de áudio.</p></div>
+        <div class="card"><h3>Salas por token</h3><p>Sessão vira um token público de 6 caracteres → QR escaneável em segundos, sem cadastro.</p></div>
+        <div class="card"><h3>Degradação suave</h3><p>Se um serviço externo falhar, a esteira não trava: a legenda continua chegando na audiência.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 IA -->
+  <section class="slide" data-title="Integração de IA">
+    <div class="slide__inner">
+      <div class="eyebrow cy">Integração de IA no produto</div>
+      <h2>Três serviços de IA na cadeia da legenda.</h2>
+      <div class="grid g3 mt">
+        <div class="card"><span class="ico">🗣️</span><h3>Fala → Texto</h3>
+          <p>Reconhecimento de voz (Web Speech API) transcreve o palestrante em PT-BR ao vivo, com resultados parciais e finais.</p></div>
+        <div class="card"><span class="ico">🌐</span><h3>Tradução neural</h3>
+          <p>API de tradução (LibreTranslate) traduz PT↔EN↔ES, com cache LRU e <b>fallback</b>: se a API falhar ou expirar, devolve o texto original — a legenda nunca trava.</p></div>
+        <div class="card"><span class="ico">🤟</span><h3>Texto → Libras</h3>
+          <p>Avatar VLibras alimentado por código: enviamos as frases finalizadas e o avatar sinaliza em Libras.</p></div>
+      </div>
+      <div class="note mt"><b>Decisão de robustez:</b> cada chamada externa tem tratamento de falha (timeout de 10s, degradação suave). Em produção priorizamos <b>legenda PT + Libras</b>, que funcionam mesmo sem o tradutor no ar.</div>
+    </div>
+  </section>
+
+  <!-- 07 IA NO DEV -->
+  <section class="slide" data-title="IA no desenvolvimento">
+    <div class="slide__inner">
+      <div class="eyebrow">Como usamos IA para desenvolver</div>
+      <h2>IA como par de programação, não como piloto automático.</h2>
+      <div class="grid g2 mt">
+        <ul class="clean">
+          <li><span class="mk">▹</span><span><b>Claude Code</b> no dia a dia: implementação, refactors e correções de bug guiadas por nós.</span></li>
+          <li><span class="mk">▹</span><span><b>Documentação viva:</b> PRD, ADRs e 33 BLs revisados e estruturados com apoio de IA.</span></li>
+          <li><span class="mk">▹</span><span><b>Auditoria técnica</b> do MVP (viabilidade, acessibilidade WCAG, riscos) gerada e revisada.</span></li>
+        </ul>
+        <ul class="clean">
+          <li class="cy"><span class="mk">▹</span><span><b>Deploy assistido:</b> Dockerfile, Compose e Caddy/HTTPS montados com IA e validados de fora.</span></li>
+          <li class="cy"><span class="mk">▹</span><span><b>Sempre com revisão humana:</b> cada mudança passa por branch, PR e teste manual antes do merge.</span></li>
+          <li class="cy"><span class="mk">▹</span><span><b>Engenharia reversa da API interna do VLibras</b> para alimentar o avatar por código.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 TESTES -->
+  <section class="slide" data-title="Testes & Qualidade">
+    <div class="slide__inner">
+      <div class="eyebrow">Testes &amp; qualidade</div>
+      <h2>Qualidade verificada em cada camada.</h2>
+      <div class="grid g3 mt">
+        <div class="card"><h3>Backend</h3><p>Testes de API (health, sessões) com pytest — contratos e regras de sessão.</p></div>
+        <div class="card"><h3>CI no GitHub Actions</h3><p>Lint + build do frontend e lint + testes do backend a cada push.</p></div>
+        <div class="card"><h3>Fluxo do usuário</h3><p>Validação ponta-a-ponta em produção: criar sessão → QR → legenda → Libras.</p></div>
+      </div>
+      <div class="note mt"><b>Transparência:</b> a cobertura automatizada está concentrada na API; os fluxos de UI e WebSocket foram validados manualmente. Próximo passo declarado: testes E2E (Playwright) e unitários de frontend.</div>
+    </div>
+  </section>
+
+  <!-- 09 DEPLOY -->
+  <section class="slide" data-title="Deploy & Acessibilidade">
+    <div class="slide__inner">
+      <div class="eyebrow cy">Publicado &amp; acessível</div>
+      <h2>No ar, com HTTPS, para qualquer navegador.</h2>
+      <div class="grid g4 mt">
+        <div class="stat good"><div class="num gd">Online</div><div class="lbl">VPS + Docker Compose atrás de Caddy (HTTPS Let's Encrypt)</div></div>
+        <div class="stat"><div class="num cap">WCAG 2.1 AA</div><div class="lbl">alto contraste, fonte ajustável, área de toque 48×48</div></div>
+        <div class="stat cy"><div class="num cy">Mobile-first</div><div class="lbl">a audiência abre em qualquer navegador moderno</div></div>
+        <div class="stat"><div class="num">24/7</div><div class="lbl">domínio público sempre no ar — sem depender da máquina do palestrante</div></div>
+      </div>
+      <div class="row mt">
+        <span class="tag">docker compose · FastAPI serve o SPA</span>
+        <span class="tag">DuckDNS → VPS</span>
+        <span class="tag">áudio processado em memória, nunca armazenado</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 STACK / DOMÍNIO -->
+  <section class="slide" data-title="Stack & Números">
+    <div class="slide__inner">
+      <div class="eyebrow">Domínio do código</div>
+      <h2>Uma stack madura, escolhida por motivo.</h2>
+      <div class="grid g2 mt">
+        <div class="grid g2">
+          <div class="stat"><div class="num">33</div><div class="lbl">Business Logics documentadas</div></div>
+          <div class="stat"><div class="num cap">7</div><div class="lbl">ADRs (decisões de arquitetura)</div></div>
+          <div class="stat cy"><div class="num cy">5</div><div class="lbl">sprints concluídas</div></div>
+          <div class="stat"><div class="num">4</div><div class="lbl">personas no PRD</div></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;justify-content:center;gap:14px">
+          <div class="row"><span class="tag">React 19 + TypeScript</span><span class="tag">Vite</span><span class="tag">Material UI</span><span class="tag">Zustand</span></div>
+          <div class="row"><span class="tag">FastAPI</span><span class="tag">WebSockets</span><span class="tag">Alembic</span><span class="tag">PostgreSQL</span></div>
+          <div class="row"><span class="tag">Web Speech API</span><span class="tag">LibreTranslate</span><span class="tag">VLibras</span></div>
+          <div class="row"><span class="tag">Docker Compose</span><span class="tag">Caddy · HTTPS</span><span class="tag">GitHub Actions</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 ENCERRAMENTO -->
+  <section class="slide" data-title="Obrigado">
+    <div class="slide__inner">
+      <div class="eyebrow">Obrigado</div>
+      <h1>Legenda para<br><span style="color:var(--cap)">todo mundo.</span></h1>
+      <p class="lead">Acessibilidade não é um detalhe; é o direito de existir no mesmo mundo que todos os outros.</p>
+      <div class="row mt">
+        <span class="pill cap">▶ legendaviva-ifrn.duckdns.org</span>
+        <span class="pill"><span class="dot"></span>No ar agora</span>
+      </div>
+      <p class="kicker mt-s" style="color:var(--dim)">Perguntas?</p>
+    </div>
+  </section>
+
+</div>
+
+<canvas id="intro" aria-label="Abertura animada — clique para pular"></canvas>
+
+<div class="chrome" id="botleft">
+  <span class="hint"><span class="kbd">←</span> <span class="kbd">→</span> ou clique para avançar · <span class="kbd">F</span> tela cheia</span>
+</div>
+
+<div class="chrome" id="botright">
+  <span class="counter"><b id="cur">01</b> / <span id="tot">11</span></span>
+  <div class="nav">
+    <button id="prev" aria-label="Slide anterior">‹</button>
+    <button id="next" aria-label="Próximo slide">›</button>
+    <button id="fs" aria-label="Tela cheia">⛶</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var n = slides.length, i = 0;
+  var progress = document.getElementById('progress');
+  var curEl = document.getElementById('cur');
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  document.getElementById('tot').textContent = String(n).padStart(2,'0');
+
+  function pad(x){return String(x+1).padStart(2,'0');}
+  function useVT(fn){
+    if(document.startViewTransition && !reduce){ document.startViewTransition(fn); } else { fn(); }
+  }
+  function paint(){
+    slides.forEach(function(s,idx){
+      s.classList.toggle('active', idx===i);
+      s.classList.toggle('past', idx<i);
+    });
+    progress.style.width = (n<2?100:(i/(n-1))*100) + '%';
+    curEl.textContent = pad(i);
+    if(location.hash !== '#'+(i+1)) history.replaceState(null,'','#'+(i+1));
+    if(i===0) typeCaption();
+  }
+  function render(){ paint(); }
+  function go(d){ var t=Math.min(Math.max(i+d,0),n-1); if(t!==i){ i=t; render(); } }
+  function to(x){ var t=Math.min(Math.max(x,0),n-1); if(t!==i){ i=t; render(); } }
+
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); go(1); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); go(-1); }
+    else if(e.key==='Home'){ e.preventDefault(); to(0); }
+    else if(e.key==='End'){ e.preventDefault(); to(n-1); }
+    else if(e.key==='f'||e.key==='F'){ toggleFs(); }
+  });
+
+  document.getElementById('deck').addEventListener('click', function(e){
+    if(e.target.closest('a,button')) return;
+    go(1);
+  });
+  document.getElementById('next').addEventListener('click', function(e){e.stopPropagation(); go(1);});
+  document.getElementById('prev').addEventListener('click', function(e){e.stopPropagation(); go(-1);});
+
+  function toggleFs(){
+    if(!document.fullscreenElement){ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+    else if(document.exitFullscreen){ document.exitFullscreen(); }
+  }
+  document.getElementById('fs').addEventListener('click', function(e){e.stopPropagation(); toggleFs();});
+
+  // touch swipe
+  var sx=0, sy=0;
+  document.addEventListener('touchstart', function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    var dx=e.changedTouches[0].clientX - sx, dy=e.changedTouches[0].clientY - sy;
+    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)){ go(dx<0?1:-1); }
+  }, {passive:true});
+
+  // ---- cover caption typing ----
+  // saudação integrada ao relógio de quem abre a apresentação
+  var hr = new Date().getHours();
+  var saud = hr<12 ? 'Bom dia' : hr<18 ? 'Boa tarde' : 'Boa noite';
+  var phrases = [
+    saud+' a todos, sejam ​bem-vindos​ à defesa.',
+    'A legenda aparece ​ao vivo​ enquanto eu falo.',
+    'E também em ​Libras​, para quem precisa.'
+  ];
+  var typedEl = document.getElementById('typed');
+  var tTimer=null, pIdx=0;
+  function wrap(txt){ // ​ marks the yellow segment boundaries
+    var parts = txt.split('​');
+    return parts.map(function(p,k){ return k%2 ? '<span class="cap-y">'+p+'</span>' : p; }).join('');
+  }
+  function typeCaption(){
+    if(!typedEl) return;
+    if(reduce){ typedEl.innerHTML = wrap(phrases[0]); return; }
+    clearTimeout(tTimer);
+    var raw = phrases[pIdx].replace(/​/g,'');
+    var yellow = phrases[pIdx];
+    var pos=0;
+    (function step(){
+      pos++;
+      // rebuild with yellow markers preserved up to pos visible chars
+      var shown=0, out='', ins=false;
+      for(var c=0;c<yellow.length;c++){
+        var ch=yellow[c];
+        if(ch==='​'){ ins=!ins; out+= ins?'<span class="cap-y">':'</span>'; continue; }
+        if(shown>=pos) break;
+        out+=ch; shown++;
+      }
+      if(ins) out+='</span>';
+      typedEl.innerHTML = out;
+      if(pos<raw.length){ tTimer=setTimeout(step, 34); }
+      else { tTimer=setTimeout(function(){ pIdx=(pIdx+1)%phrases.length; if(i===0) typeCaption(); }, 2200); }
+    })();
+  }
+
+  // deep link
+  var start = parseInt((location.hash||'').replace('#',''),10);
+  if(start>=1 && start<=n) i=start-1;
+  render();
+})();
+</script>
+
+<script>
+/* Intro cinematográfica (~30s, com trilha sonora) — adaptação em código do arco
+   do hype video de referência: boot → fly-through wireframe → legendas voando →
+   portal de luz → flash → reveal. Trilha 100% sintetizada via WebAudio (sem
+   arquivos externos), sincronizada com a timeline. Canvas 2D puro, sem libs. */
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var cv = document.getElementById('intro');
+  if(!cv) return;
+  // pula a intro em reduced-motion ou quando entra por deep-link num slide interno
+  var hashN = parseInt((location.hash||'').replace('#',''),10);
+  if(reduce || (hashN>1)){ cv.remove(); return; }
+
+  var ctx = cv.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio||1, 1.5), W,H,CX,CY;
+  function size(){
+    W=window.innerWidth; H=window.innerHeight;
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+    cv.style.width=W+'px'; cv.style.height=H+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0); CX=W/2; CY=H/2;
+    ctx.fillStyle='#04060A'; ctx.fillRect(0,0,W,H);
+  }
+  size(); window.addEventListener('resize', size);
+
+  /* ---------------- timeline (segundos) ----------------
+     0–8    boot do sistema (terminal) + deriva lenta
+     8–24   túnel acelerando; 13+ legendas voando
+     24–28.6 riser + portal crescendo
+     28.6–30.2 flash branco → fade para a capa           */
+  var T_TUNNEL=8, T_WORDS=13, T_PORTAL=24, T_FLASH=28.6, T_END=30.2;
+
+  var F=420, MAXZ=1600;
+  var stars=[], blocks=[], words=[], i;
+  for(i=0;i<380;i++) stars.push({x:(Math.random()*2-1)*1400, y:(Math.random()*2-1)*900, z:Math.random()*MAXZ+80, c:Math.random()});
+  for(i=0;i<64;i++) blocks.push({x:(Math.random()*2-1)*1150, y:(Math.random()*2-1)*760, z:Math.random()*MAXZ+150, s:14+Math.random()*38, yel:Math.random()<.3});
+  var WORDLIST=['acessibilidade','legenda ao vivo','Libras','tempo real','inclusão','PT · EN · ES','sem barreiras','para todo mundo','fala → texto','um link só'];
+  for(i=0;i<WORDLIST.length;i++) words.push({txt:WORDLIST[i], x:(Math.random()*2-1)*520, y:(Math.random()*2-1)*340, z:MAXZ+i*520, yel:i%3===0});
+
+  var BOOT=[
+    '> inicializando LegendaViva v1.0',
+    '> reconhecimento de voz ........ OK',
+    '> tradução PT ↔ EN ↔ ES ........ OK',
+    '> avatar Libras (VLibras) ...... OK',
+    '> transmissão em tempo real .... OK',
+    '> abrindo sessão ao vivo_'
+  ];
+
+  var started=false, done=false, t0=null, prev=0, glitchT=0, lastT=0, swx=0, swy=0;
+
+  /* ---------------- trilha sonora procedural ---------------- */
+  var ac=null, master=null;
+  function startMusic(){
+    try{
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+      ac=new AC();
+      var t=ac.currentTime+.06;
+      master=ac.createGain();
+      // crescendo emocional: sobe do sussurro ao clímax no portal
+      master.gain.setValueAtTime(.0001,t);
+      master.gain.exponentialRampToValueAtTime(.48,t+2.2);
+      master.gain.linearRampToValueAtTime(.74,t+T_PORTAL);
+      master.gain.setValueAtTime(.74,t+T_FLASH);
+      master.gain.exponentialRampToValueAtTime(.0001,t+T_END+2.4);
+      var comp=ac.createDynamicsCompressor();
+      master.connect(comp); comp.connect(ac.destination);
+
+      // reverb de sala grande, gerado em código — o "tamanho de cinema"
+      var IRlen=Math.floor(ac.sampleRate*3), ir=ac.createBuffer(2,IRlen,ac.sampleRate), ch,cd,q;
+      for(ch=0;ch<2;ch++){
+        cd=ir.getChannelData(ch);
+        for(q=0;q<IRlen;q++) cd[q]=(Math.random()*2-1)*Math.pow(1-q/IRlen,2.6);
+      }
+      var verb=ac.createConvolver(); verb.buffer=ir;
+      var wet=ac.createGain(); wet.gain.value=.4;
+      verb.connect(wet); wet.connect(master);
+      function toVerb(node,amt){
+        var s=ac.createGain(); s.gain.value=amt;
+        node.connect(s); s.connect(verb);
+      }
+
+      // pads: cordas sintéticas (saws desafinados + sub no baixo), filtro abrindo
+      var padLP=ac.createBiquadFilter(); padLP.type='lowpass';
+      padLP.frequency.setValueAtTime(420,t);
+      padLP.frequency.linearRampToValueAtTime(3400,t+T_PORTAL);
+      var padBus=ac.createGain(); padBus.gain.value=.17;
+      padBus.connect(padLP); padLP.connect(master); toVerb(padLP,.7);
+      function padChord(freqs,start,dur,vol){
+        vol=vol||.5;
+        freqs.forEach(function(f,fi){
+          [-8,8].forEach(function(det){
+            var o=ac.createOscillator(), g=ac.createGain();
+            o.type='sawtooth'; o.frequency.value=f; o.detune.value=det;
+            g.gain.setValueAtTime(.0001,t+start);
+            g.gain.exponentialRampToValueAtTime(vol,t+start+1.2);
+            g.gain.setValueAtTime(vol,t+start+Math.max(1.3,dur-1));
+            g.gain.exponentialRampToValueAtTime(.0001,t+start+dur);
+            o.connect(g); g.connect(padBus);
+            o.start(t+start); o.stop(t+start+dur+.15);
+          });
+          if(fi===0){ // sub uma oitava abaixo da fundamental: o "peito" do acorde
+            var so=ac.createOscillator(), sg=ac.createGain();
+            so.type='sine'; so.frequency.value=f/2;
+            sg.gain.setValueAtTime(.0001,t+start);
+            sg.gain.exponentialRampToValueAtTime(vol*.55,t+start+1.2);
+            sg.gain.exponentialRampToValueAtTime(.0001,t+start+dur);
+            so.connect(sg); sg.connect(padBus);
+            so.start(t+start); so.stop(t+start+dur+.15);
+          }
+        });
+      }
+      // progressão emocional com nonas/sétimas: Am9 → Fmaj7 → Cadd9 → G (4s cada)
+      var Am9=[220,261.63,329.63,493.88], Fmaj7=[174.61,220,261.63,329.63],
+          Cadd9=[261.63,329.63,392,587.33], Gq=[196,246.94,293.66,392];
+      var prog=[Am9,Fmaj7,Cadd9,Gq,Am9,Fmaj7], roots=[110,87.31,130.81,98,110,87.31];
+      prog.forEach(function(chd,ix){ padChord(chd, ix*4, 4.4); });
+      padChord(Gq, 24, 4.6, .58);
+
+      // sinos esparsos no boot — emoção desde o primeiro segundo
+      function pluck(start,f,vol){
+        var o=ac.createOscillator(), g=ac.createGain();
+        o.type='triangle'; o.frequency.value=f;
+        g.gain.setValueAtTime(.0001,t+start);
+        g.gain.exponentialRampToValueAtTime(vol,t+start+.015);
+        g.gain.exponentialRampToValueAtTime(.0001,t+start+1.7);
+        o.connect(g); g.connect(master); toVerb(g,1.2);
+        o.start(t+start); o.stop(t+start+1.9);
+      }
+      [[0.4,880],[1.5,659.25],[2.6,523.25],[3.7,659.25],[4.8,987.77],[6.0,880],[7.2,659.25]]
+        .forEach(function(nn){ pluck(nn[0],nn[1],.22); });
+      // arpejo contínuo acompanhando os acordes (8s → 24s)
+      for(var sa=8; sa<24; sa+=1){
+        var chd2=prog[Math.min(Math.floor(sa/4),5)];
+        pluck(sa, chd2[sa%chd2.length]*2, .12);
+      }
+
+      // melodia principal — lead com vibrato + delay, cantando por cima
+      var dly=ac.createDelay(1.2); dly.delayTime.value=.45;
+      var fb=ac.createGain(); fb.gain.value=.3;
+      var dwet=ac.createGain(); dwet.gain.value=.22;
+      dly.connect(fb); fb.connect(dly); dly.connect(dwet); dwet.connect(master); toVerb(dwet,.8);
+      function lead(start,f,dur,vol){
+        vol=vol||.3;
+        var o1=ac.createOscillator(), o2=ac.createOscillator(),
+            g=ac.createGain(), lp=ac.createBiquadFilter();
+        o1.type='sawtooth'; o2.type='triangle';
+        o1.frequency.value=f; o2.frequency.value=f;
+        o1.detune.value=-5; o2.detune.value=5;
+        lp.type='lowpass'; lp.frequency.value=2600;
+        var lfo=ac.createOscillator(), lg=ac.createGain(); // vibrato que entra devagar
+        lfo.frequency.value=5.2;
+        lg.gain.setValueAtTime(0,t+start);
+        lg.gain.linearRampToValueAtTime(f*.007,t+start+Math.min(.6,dur*.5));
+        lfo.connect(lg); lg.connect(o1.frequency); lg.connect(o2.frequency);
+        g.gain.setValueAtTime(.0001,t+start);
+        g.gain.exponentialRampToValueAtTime(vol,t+start+.12);
+        g.gain.setValueAtTime(vol,t+start+Math.max(.15,dur-.3));
+        g.gain.exponentialRampToValueAtTime(.0001,t+start+dur+.08);
+        o1.connect(lp); o2.connect(lp); lp.connect(g);
+        g.connect(master); g.connect(dly); toVerb(g,.9);
+        o1.start(t+start); o2.start(t+start); lfo.start(t+start);
+        o1.stop(t+start+dur+.25); o2.stop(t+start+dur+.25); lfo.stop(t+start+dur+.25);
+      }
+      // clímax melódico só na reta do portal (24s → 28.6s), subindo até o flash
+      [[24,659.25,1.6],[25.8,783.99,1.4],[27.2,880,1.5]]
+        .forEach(function(nn){ lead(nn[0],nn[1],nn[2],.32); });
+
+      var beat=.5; // 120 BPM — cada acorde = 2 compassos, tudo cravado
+      var noise=ac.createBuffer(1, Math.floor(ac.sampleRate*.25), ac.sampleRate);
+      var ndt=noise.getChannelData(0);
+      for(i=0;i<ndt.length;i++) ndt[i]=Math.random()*2-1;
+
+      // BUMBO forte: corpo grave + clique de ataque (soca no peito)
+      function kick(start,vol){
+        vol=vol||.9;
+        var o=ac.createOscillator(), g=ac.createGain();
+        o.type='sine';
+        o.frequency.setValueAtTime(165,t+start);
+        o.frequency.exponentialRampToValueAtTime(38,t+start+.13);
+        g.gain.setValueAtTime(vol,t+start);
+        g.gain.exponentialRampToValueAtTime(.0001,t+start+.24);
+        o.connect(g); g.connect(master);
+        o.start(t+start); o.stop(t+start+.28);
+        var c=ac.createBufferSource(); c.buffer=noise;
+        var chp=ac.createBiquadFilter(); chp.type='highpass'; chp.frequency.value=3200;
+        var cg=ac.createGain();
+        cg.gain.setValueAtTime(vol*.35,t+start);
+        cg.gain.exponentialRampToValueAtTime(.0001,t+start+.03);
+        c.connect(chp); chp.connect(cg); cg.connect(master);
+        c.start(t+start); c.stop(t+start+.05);
+      }
+      // CAIXA com cauda de reverb (no 2 e no 4)
+      function snare(start){
+        var s=ac.createBufferSource(); s.buffer=noise;
+        var bpF=ac.createBiquadFilter(); bpF.type='bandpass'; bpF.frequency.value=1900; bpF.Q.value=.9;
+        var g=ac.createGain();
+        g.gain.setValueAtTime(.5,t+start);
+        g.gain.exponentialRampToValueAtTime(.0001,t+start+.18);
+        s.connect(bpF); bpF.connect(g); g.connect(master); toVerb(g,.6);
+        s.start(t+start); s.stop(t+start+.2);
+      }
+      // chimbal em semicolcheias (a "correria" do túnel)
+      function hat(start,vol){
+        var src=ac.createBufferSource(); src.buffer=noise;
+        var hp=ac.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=7500;
+        var g=ac.createGain();
+        g.gain.setValueAtTime(vol,t+start);
+        g.gain.exponentialRampToValueAtTime(.0001,t+start+.05);
+        src.connect(hp); hp.connect(g); g.connect(master);
+        src.start(t+start); src.stop(t+start+.06);
+      }
+      // baixo pulsado no contratempo (bomba clássica de pista)
+      function bstab(start,f){
+        var o=ac.createOscillator(), g=ac.createGain(), lp=ac.createBiquadFilter();
+        o.type='sawtooth'; o.frequency.value=f;
+        lp.type='lowpass'; lp.frequency.value=420;
+        g.gain.setValueAtTime(.0001,t+start);
+        g.gain.exponentialRampToValueAtTime(.45,t+start+.015);
+        g.gain.exponentialRampToValueAtTime(.0001,t+start+.22);
+        o.connect(lp); lp.connect(g); g.connect(master);
+        o.start(t+start); o.stop(t+start+.26);
+      }
+      // stab de acorde no início de cada compasso (hino de pista)
+      function stab(start,chd){
+        chd.forEach(function(f){
+          var o=ac.createOscillator(), g=ac.createGain();
+          o.type='sawtooth'; o.frequency.value=f*2;
+          g.gain.setValueAtTime(.0001,t+start);
+          g.gain.exponentialRampToValueAtTime(.16,t+start+.01);
+          g.gain.exponentialRampToValueAtTime(.0001,t+start+.3);
+          o.connect(g); g.connect(master); toVerb(g,.7);
+          o.start(t+start); o.stop(t+start+.35);
+        });
+      }
+
+      // build-up anunciando o drop (6s → 8s): bumbo acelerando
+      [6,6.5,7,7.25,7.5,7.75].forEach(function(bt,ix){ kick(bt,.25+ix*.11); });
+
+      // O DROP (8s → 28s): four-on-the-floor cravado no percurso do túnel
+      var sb, ci, rt;
+      for(sb=8; sb<28; sb+=beat){
+        ci=Math.min(Math.floor(sb/4),5); rt=sb<24?roots[ci]:98;
+        kick(sb);                                     // bumbo em todo tempo
+        bstab(sb+beat/2, rt);                         // baixo no contratempo
+        hat(sb+beat*.25,.07); hat(sb+beat*.75,.13);   // semicolcheias
+        if(Math.round((sb-8)/beat)%2===1) snare(sb);  // caixa no 2 e no 4
+        // pads "bombeando" junto com o bumbo (sidechain)
+        padBus.gain.setValueAtTime(.07,t+sb+.01);
+        padBus.gain.linearRampToValueAtTime(.24,t+sb+beat*.9);
+      }
+      // stab de acorde a cada compasso (8s → 24s)
+      for(sb=8; sb<24; sb+=2) stab(sb, prog[Math.min(Math.floor(sb/4),5)]);
+      // sub-grave sustentado por acorde: peso contínuo embaixo do groove
+      for(ci=2; ci<6; ci++){
+        var so2=ac.createOscillator(), sg2=ac.createGain();
+        so2.type='sine'; so2.frequency.value=roots[ci]/2;
+        sg2.gain.setValueAtTime(.0001,t+ci*4);
+        sg2.gain.exponentialRampToValueAtTime(.3,t+ci*4+.3);
+        sg2.gain.setValueAtTime(.3,t+ci*4+3.6);
+        sg2.gain.exponentialRampToValueAtTime(.0001,t+ci*4+4);
+        so2.connect(sg2); sg2.connect(master);
+        so2.start(t+ci*4); so2.stop(t+ci*4+4.1);
+      }
+      // reta final: bumbo dobra e a caixa rufa até o flash
+      for(sb=26.5; sb<28.5; sb+=.25) kick(sb,.7);
+      for(sb=28; sb<28.55; sb+=.125) snare(sb);
+      // riser de ruído acompanhando o portal (24s → 28.6s)
+      var rb=ac.createBuffer(1, Math.floor(ac.sampleRate*5.2), ac.sampleRate);
+      var rd=rb.getChannelData(0);
+      for(i=0;i<rd.length;i++) rd[i]=Math.random()*2-1;
+      var rn=ac.createBufferSource(); rn.buffer=rb;
+      var bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=1.2;
+      bp.frequency.setValueAtTime(300,t+24);
+      bp.frequency.exponentialRampToValueAtTime(6000,t+28.6);
+      var rg=ac.createGain();
+      rg.gain.setValueAtTime(.0001,t+24);
+      rg.gain.exponentialRampToValueAtTime(.3,t+28.5);
+      rg.gain.exponentialRampToValueAtTime(.0001,t+29.4);
+      rn.connect(bp); bp.connect(rg); rg.connect(master);
+      rn.start(t+24); rn.stop(t+29.5);
+
+      // clímax do flash: boom de sub-grave + acorde C maior gigante + nota brilhando
+      kick(T_FLASH);
+      var bo=ac.createOscillator(), bg=ac.createGain();
+      bo.type='sine';
+      bo.frequency.setValueAtTime(70,t+T_FLASH);
+      bo.frequency.exponentialRampToValueAtTime(40,t+T_FLASH+1.5);
+      bg.gain.setValueAtTime(.65,t+T_FLASH);
+      bg.gain.exponentialRampToValueAtTime(.0001,t+T_FLASH+2.4);
+      bo.connect(bg); bg.connect(master);
+      bo.start(t+T_FLASH); bo.stop(t+T_FLASH+2.5);
+      padChord([130.81,261.63,329.63,392,523.25,587.33], T_FLASH, 5.2, .6);
+      lead(T_FLASH+.12, 1046.5, 2.2, .26);
+    }catch(e){ /* sem áudio: a intro segue muda */ }
+  }
+  function stopMusic(fast){
+    if(!ac) return;
+    try{
+      var now=ac.currentTime;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(.5,now);
+      master.gain.exponentialRampToValueAtTime(.0001, now+(fast?.3:2.2));
+      setTimeout(function(){ try{ ac.close(); }catch(e){} }, fast?420:2400);
+    }catch(e){}
+  }
+
+  /* ---------------- render ---------------- */
+  function proj(x,y,z){ var s=F/z; return [CX+swx+x*s, CY+swy+y*s, s]; }
+
+  function drawGate(tt,dt){
+    ctx.globalCompositeOperation='source-over';
+    ctx.fillStyle='rgba(4,6,10,.35)'; ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+    var st,a;
+    for(i=0;i<stars.length;i++){
+      st=stars[i]; st.z-=42*dt*(.6+st.c);
+      if(st.z<40){ st.z=MAXZ; st.x=(Math.random()*2-1)*1400; st.y=(Math.random()*2-1)*900; }
+      a=proj(st.x,st.y,st.z);
+      ctx.fillStyle='rgba(150,220,235,'+(.08+.3*(1-st.z/MAXZ)).toFixed(3)+')';
+      ctx.fillRect(a[0],a[1],Math.max(1,1.6*a[2]),Math.max(1,1.6*a[2]));
+    }
+    ctx.globalCompositeOperation='source-over';
+    var ts=Math.min(72, W*.08);
+    ctx.font='800 '+ts+'px "Segoe UI",system-ui,sans-serif';
+    ctx.textAlign='left';
+    var w1=ctx.measureText('Legenda').width, w2=ctx.measureText('Viva').width;
+    var x0=CX-(w1+w2)/2;
+    ctx.fillStyle='#F5F7F9'; ctx.fillText('Legenda', x0, CY-30);
+    ctx.fillStyle='#F4C740'; ctx.fillText('Viva', x0+w1, CY-30);
+    ctx.textAlign='center';
+    var pulse=.55+.25*Math.sin(tt*2.4);
+    ctx.font='600 17px "Segoe UI",system-ui,sans-serif';
+    ctx.fillStyle='rgba(244,199,64,'+pulse.toFixed(3)+')';
+    ctx.fillText('▶  clique para iniciar a apresentação', CX, CY+34);
+    ctx.font='13px Consolas,ui-monospace,monospace';
+    ctx.fillStyle='rgba(154,166,176,.6)';
+    ctx.fillText('abertura de 30s com áudio · Esc pula direto', CX, CY+64);
+  }
+
+  function drawRun(t,dt){
+    lastT=t;
+    var speed = t<T_TUNNEL
+      ? 90+t*20
+      : 250+(t-T_TUNNEL)*40 + (t>T_PORTAL ? (t-T_PORTAL)*900 : 0);
+    // balanço de câmera sutil, mais forte na aceleração
+    var shake=t>T_PORTAL ? 4 : 0;
+    swx=Math.sin(t*.6)*8 + (Math.random()*2-1)*shake;
+    swy=Math.cos(t*.45)*6 + (Math.random()*2-1)*shake;
+
+    ctx.globalCompositeOperation='source-over';
+    ctx.fillStyle='rgba(4,6,10,.46)'; ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation='lighter';
+
+    // anéis do túnel (entram suavemente a partir do boot)
+    var ringA=Math.min(1, t/T_TUNNEL);
+    // pulso visual cravado no bumbo (120 BPM = batida a cada 0.5s a partir dos 8s)
+    var beatP=(t>T_TUNNEL && t<T_FLASH) ? Math.pow(1-((t-T_TUNNEL)%.5)/.5, 3) : 0;
+    ringA*=1+beatP*.8;
+    var k,z,s,half,rot;
+    for(k=0;k<14;k++){
+      z=MAXZ-((t*speed+k*(MAXZ/14))%MAXZ);
+      s=F/z; half=900*s; rot=Math.sin(t*.4+k*1.7)*.05;
+      ctx.save(); ctx.translate(CX+swx,CY+swy); ctx.rotate(rot);
+      ctx.strokeStyle='rgba(76,201,214,'+(ringA*(.04+.34*(1-z/MAXZ))).toFixed(3)+')';
+      ctx.lineWidth=Math.max(1,2.4*s);
+      ctx.strokeRect(-half,-half*.62,half*2,half*1.24);
+      ctx.restore();
+    }
+    // clarão central acompanhando o bumbo
+    if(beatP>.02){
+      var bg2=ctx.createRadialGradient(CX+swx,CY+swy,0,CX+swx,CY+swy,Math.max(W,H)*.5);
+      bg2.addColorStop(0,'rgba(120,210,235,'+(beatP*.12).toFixed(3)+')');
+      bg2.addColorStop(1,'rgba(120,210,235,0)');
+      ctx.fillStyle=bg2; ctx.fillRect(0,0,W,H);
+    }
+
+    // estrelas em streak
+    var st,a,b;
+    for(i=0;i<stars.length;i++){
+      st=stars[i];
+      var pz=st.z; st.z-=speed*dt*(.6+st.c);
+      if(st.z<40){ st.z=MAXZ; st.x=(Math.random()*2-1)*1400; st.y=(Math.random()*2-1)*900; }
+      a=proj(st.x,st.y,st.z); b=proj(st.x,st.y,Math.min(pz,st.z+speed*.055));
+      ctx.strokeStyle = st.c>.93
+        ? 'rgba(244,199,64,.8)'
+        : 'rgba(150,220,235,'+(.12+.5*(1-st.z/MAXZ)).toFixed(3)+')';
+      ctx.lineWidth=Math.max(.6,2.2*a[2]);
+      ctx.beginPath(); ctx.moveTo(b[0],b[1]); ctx.lineTo(a[0],a[1]); ctx.stroke();
+    }
+
+    // blocos de dados
+    var bl,p,sz;
+    for(i=0;i<blocks.length;i++){
+      bl=blocks[i]; bl.z-=speed*dt*.8;
+      if(bl.z<60) bl.z=MAXZ;
+      p=proj(bl.x,bl.y,bl.z); sz=bl.s*p[2];
+      ctx.fillStyle = bl.yel
+        ? 'rgba(244,199,64,'+(.08+.28*(1-bl.z/MAXZ)).toFixed(3)+')'
+        : 'rgba(80,160,230,'+(.07+.28*(1-bl.z/MAXZ)).toFixed(3)+')';
+      ctx.fillRect(p[0]-sz/2,p[1]-sz/2,sz,sz*.62);
+    }
+
+    // legendas voando pelo túnel (o "conteúdo" do produto)
+    if(t>T_WORDS){
+      var wd,fs;
+      for(i=0;i<words.length;i++){
+        wd=words[i]; wd.z-=speed*dt*.9;
+        if(wd.z<70) wd.z=MAXZ*3; // cada palavra passa uma vez
+        if(wd.z>MAXZ) continue;
+        p=proj(wd.x,wd.y,wd.z); fs=Math.max(10,40*p[2]);
+        ctx.font='700 '+fs.toFixed(0)+'px "Segoe UI",system-ui,sans-serif';
+        ctx.textAlign='center';
+        ctx.fillStyle = wd.yel
+          ? 'rgba(244,199,64,'+(.15+.65*(1-wd.z/MAXZ)).toFixed(3)+')'
+          : 'rgba(220,240,250,'+(.10+.55*(1-wd.z/MAXZ)).toFixed(3)+')';
+        ctx.fillText(wd.txt, p[0], p[1]);
+      }
+    }
+
+    // portal de luz
+    if(t>T_PORTAL){
+      var pt=Math.min(1,(t-T_PORTAL)/(T_FLASH-T_PORTAL));
+      var R=20+pt*pt*Math.max(W,H)*.55;
+      var g=ctx.createRadialGradient(CX,CY,R*.3,CX,CY,R);
+      g.addColorStop(0,'rgba(255,255,255,'+(.1+.8*pt).toFixed(3)+')');
+      g.addColorStop(.72,'rgba(140,220,255,'+(.28*pt).toFixed(3)+')');
+      g.addColorStop(1,'rgba(140,220,255,0)');
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(CX,CY,R,0,6.2832); ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,'+(.45+.55*pt).toFixed(3)+')';
+      ctx.lineWidth=5+24*pt;
+      ctx.beginPath(); ctx.arc(CX,CY,R*.7,0,6.2832); ctx.stroke();
+    }
+
+    // glitch em fatias
+    ctx.globalCompositeOperation='source-over';
+    glitchT-=dt;
+    if(glitchT<=0 && Math.random()<(t>T_TUNNEL?.035:.012) && t<T_FLASH) glitchT=.12;
+    if(glitchT>0){
+      var cols=['rgba(242,118,107,.08)','rgba(84,217,140,.07)','rgba(76,201,214,.10)'];
+      for(k=0;k<3;k++){
+        ctx.fillStyle=cols[k];
+        ctx.fillRect((Math.random()*2-1)*44, Math.random()*H, W, 8+Math.random()*26);
+      }
+    }
+
+    // terminal de boot (primeiro ato)
+    if(t<T_TUNNEL+2){
+      var fade=t>T_TUNNEL ? Math.max(0,1-(t-T_TUNNEL)/2) : 1;
+      ctx.font='14px Consolas,ui-monospace,monospace';
+      ctx.textAlign='left';
+      var li,lt,shown;
+      for(li=0;li<BOOT.length;li++){
+        lt=t-(0.6+li*1.15);
+        if(lt<=0) continue;
+        shown=BOOT[li].slice(0,Math.floor(lt*30));
+        ctx.fillStyle = BOOT[li].indexOf('OK')>-1 && shown.indexOf('OK')>-1
+          ? 'rgba(84,217,140,'+(0.85*fade).toFixed(3)+')'
+          : 'rgba(154,166,176,'+(0.85*fade).toFixed(3)+')';
+        ctx.fillText(shown, Math.max(34,W*.08), H*.32+li*24);
+      }
+    }
+
+    // barra de progresso da intro + hint
+    ctx.fillStyle='rgba(76,201,214,.5)';
+    ctx.fillRect(0,H-3,W*(t/T_END),2);
+    ctx.font='13px Consolas,ui-monospace,monospace';
+    ctx.textAlign='right';
+    ctx.fillStyle='rgba(154,166,176,.55)';
+    ctx.fillText('clique para pular', W-28, H-28);
+
+    // flash branco final
+    if(t>T_FLASH){
+      var ft=Math.min(1,(t-T_FLASH)/(T_END-T_FLASH));
+      ctx.fillStyle='rgba(255,255,255,'+ft.toFixed(3)+')';
+      ctx.fillRect(0,0,W,H);
+    }
+  }
+
+  function loop(ts){
+    if(done) return;
+    var dt=prev?Math.min((ts-prev)/1000,.05):.016; prev=ts;
+    if(!started){ drawGate(ts/1000,dt); requestAnimationFrame(loop); return; }
+    if(t0===null) t0=ts;
+    var t=(ts-t0)/1000;
+    drawRun(t,dt);
+    if(t>=T_END){ finish(); return; }
+    requestAnimationFrame(loop);
+  }
+
+  function start(){
+    if(started) return;
+    started=true; t0=null; swx=0; swy=0;
+    startMusic(); // dentro do gesto do usuário → autoplay liberado
+  }
+
+  function finish(){
+    if(done) return; done=true;
+    stopMusic(lastT<T_FLASH); // pulou cedo = corta rápido; fim natural = deixa ressoar
+    cv.classList.add('out');
+    var act=document.querySelector('.slide.active');
+    if(act){ act.classList.remove('active'); void act.offsetWidth; act.classList.add('active'); }
+    setTimeout(function(){ cv.remove(); }, 850);
+  }
+
+  cv.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(!started){ start(); } else { finish(); }
+  });
+  document.addEventListener('keydown', function(e){
+    if(done) return;
+    var keys=['Escape','Enter',' ','ArrowRight','ArrowLeft','PageDown','PageUp'];
+    if(keys.indexOf(e.key)===-1) return;
+    e.preventDefault(); e.stopPropagation();
+    if(!started){
+      if(e.key==='Escape'){ finish(); } else { start(); }
+    } else {
+      finish();
+    }
+  }, true);
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
