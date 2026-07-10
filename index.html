@@ -13,7 +13,7 @@
   :root{
     --ink:#0A0C0F; --ink-2:#0E1216; --surface:#151A21; --surface-2:#1C2530;
     --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.055);
-    --text:#F5F7F9; --muted:#98A4B0; --dim:#67747F;
+    --text:#F5F7F9; --muted:#98A4B0; --dim:#7C8894; /* dim ≥4.5:1 sobre --ink (WCAG AA) */
     --cap:#F4C740; --cap-2:#FFD75E; --cap-soft:rgba(244,199,64,.12); --cap-line:rgba(244,199,64,.34);
     --cyan:#4CC9D6; --cyan-soft:rgba(76,201,214,.11);
     --good:#54D98C; --warn:#F2B14B; --bad:#F2766B;
@@ -22,6 +22,8 @@
     --f-sans:"Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
     --f-mono:"Cascadia Code",ui-monospace,"SFMono-Regular",Consolas,monospace;
     --ease:cubic-bezier(.22,.61,.36,1);
+    --ease-out:cubic-bezier(.22,1,.36,1); --ease-in:cubic-bezier(.4,0,1,1);
+    --dur-fast:.2s; --dur-base:.35s; --dur-slow:.55s;
     color-scheme:dark;
   }
   *{box-sizing:border-box; margin:0; padding:0}
@@ -52,7 +54,19 @@
   }
   .slide.active{opacity:1; visibility:visible; transform:none;}
   .slide.past{transform:scale(.99);}
-  .slide__inner{width:100%; max-width:1120px; margin:0 auto;}
+  .slide__inner{width:100%; max-width:1120px; margin:0 auto; position:relative;}
+
+  /* número editorial da seção — marca d'água discreta (Swiss/editorial) */
+  #deck{counter-reset:sec;}
+  .slide{counter-increment:sec;}
+  .slide__inner::before{
+    content:counter(sec,decimal-leading-zero);
+    position:absolute; top:-.34em; right:-.06em; z-index:0;
+    font-family:var(--f-mono); font-weight:800; letter-spacing:-.05em;
+    font-size:clamp(64px,13vw,168px); line-height:1;
+    color:var(--line-2); pointer-events:none; user-select:none;
+  }
+  .slide__inner>*{position:relative; z-index:1;}
 
   /* staggered reveal of each top-level block */
   .slide__inner>*{opacity:0; transform:translateY(22px); filter:blur(2px);
@@ -64,9 +78,18 @@
   .slide.active .slide__inner>*:nth-child(4){transition-delay:.34s}
   .slide.active .slide__inner>*:nth-child(5){transition-delay:.42s}
 
+  /* headline: reveal por máscara — tipografia cinética (nível agência) */
+  .slide__inner>h1,.slide__inner>h2{
+    transform:none; clip-path:inset(0 0 106% 0);
+    transition:opacity .6s var(--ease), clip-path .8s var(--ease-out), filter .6s var(--ease);
+  }
+  .slide.active .slide__inner>h1,
+  .slide.active .slide__inner>h2{ clip-path:inset(-.14em 0 -.14em 0); }
+
   @media (prefers-reduced-motion:reduce){
     .slide{transition:opacity .2s, visibility .2s; transform:none!important}
     .slide__inner>*{transition:none; opacity:1; transform:none; filter:none}
+    .slide__inner>h1,.slide__inner>h2{clip-path:none}
   }
 
   /* ---------- typography ---------- */
@@ -78,8 +101,10 @@
   }
   .eyebrow::before{content:""; width:28px; height:2px; background:var(--cap); border-radius:2px; box-shadow:0 0 12px var(--cap-line);}
   .eyebrow.cy{color:var(--cyan)} .eyebrow.cy::before{background:var(--cyan); box-shadow:0 0 12px rgba(76,201,214,.5)}
-  h1{font-size:clamp(40px,7.8vw,108px); line-height:.96; letter-spacing:-.035em; font-weight:800; text-wrap:balance;}
+  h1,.display{font-size:clamp(40px,7.8vw,108px); line-height:.96; letter-spacing:-.035em; font-weight:800; text-wrap:balance;}
   h2{font-size:clamp(28px,4.7vw,60px); line-height:1.01; letter-spacing:-.022em; font-weight:800; text-wrap:balance;}
+  /* leitor de tela: some visualmente, mas continua acessível */
+  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;}
   .lead{font-size:clamp(16px,2.05vw,23px); line-height:1.5; color:var(--muted); max-width:60ch; margin-top:clamp(14px,2vw,22px);}
   .kicker{font-size:clamp(15px,1.7vw,19px); color:var(--text); line-height:1.5;}
   p{text-wrap:pretty}
@@ -99,6 +124,26 @@
     animation:blink 1.05s steps(1) infinite;}
   @keyframes blink{50%{opacity:0}}
   @media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+
+  /* equalizador de voz — "ícone vivo" (princípios rive-lottie, zero runtime) */
+  .eq{display:inline-flex; gap:3px; align-items:flex-end; height:.95em; margin-right:.6em; vertical-align:-.08em;}
+  .eq i{width:3px; border-radius:2px; background:var(--cap); transform-origin:bottom;
+    animation:eqb 1.15s var(--ease-in-out,ease-in-out) infinite;}
+  .eq i:nth-child(1){height:45%; animation-delay:0s}
+  .eq i:nth-child(2){height:90%; animation-delay:.18s}
+  .eq i:nth-child(3){height:60%; animation-delay:.36s}
+  .eq i:nth-child(4){height:80%; animation-delay:.54s}
+  @keyframes eqb{50%{transform:scaleY(.35)}}
+  /* pausa quando o slide sai de cena — princípio "pause fora da viewport" */
+  .slide:not(.active) .eq i{animation-play-state:paused}
+  @media (prefers-reduced-motion:reduce){.eq i{animation:none}}
+
+  /* QR de conversão — fricção zero para a audiência abrir o app (CRO) */
+  .qrbox{display:flex; flex-direction:column; align-items:center; gap:12px; justify-self:center;}
+  .qrbox .qrcard{background:#fff; border-radius:16px; padding:clamp(12px,1.4vw,16px);
+    width:clamp(150px,17vw,210px); box-shadow:var(--shadow);}
+  .qrbox svg{display:block; width:100%; height:auto; color:#0A0C0F; shape-rendering:crispEdges;}
+  .qrbox .qrlbl{font-size:clamp(12px,1.3vw,14px); color:var(--muted); text-align:center; line-height:1.4;}
 
   /* ---------- layout utils ---------- */
   .grid{display:grid; gap:clamp(14px,1.8vw,20px);}
@@ -141,6 +186,11 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(84,217,140,.45)}70%{box-shadow:0 0 0 9px rgba(84,217,140,0)}100%{box-shadow:0 0 0 0 rgba(84,217,140,0)}}
   @media (prefers-reduced-motion:reduce){.pill .dot{animation:none}}
   .pill.cap{border-color:var(--cap-line); background:var(--cap-soft); color:var(--cap)}
+  a.pill{text-decoration:none; cursor:pointer;
+    transition:transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);}
+  .slide.active a.pill:hover{transform:translateY(-2px); border-color:var(--cap)}
+  a.pill:active{transform:translateY(0) scale(.97)}
+  a.pill:focus-visible{outline:2px solid var(--cap); outline-offset:3px}
   .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
 
   .tag{font-family:var(--f-mono); font-size:clamp(11px,1.2vw,13px); color:var(--muted);
@@ -173,7 +223,7 @@
   .counter{font-family:var(--f-mono); font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
   .counter b{color:var(--text)}
   .nav{display:flex; gap:8px}
-  .nav button{width:38px; height:38px; border-radius:10px; border:1px solid var(--line);
+  .nav button{width:44px; height:44px; border-radius:10px; border:1px solid var(--line);
     background:var(--surface); color:var(--text); font-size:17px; cursor:pointer;
     display:grid; place-items:center; transition:background .15s, border-color .15s, transform .15s;}
   .nav button:hover{background:var(--surface-2); border-color:var(--cap-line)}
@@ -203,8 +253,9 @@
 
 <div id="progress"></div>
 <div id="brand"><span class="sq"></span>LegendaViva <small>· Grupo 9</small></div>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-<div id="deck">
+<main id="deck" aria-label="Slides da apresentação">
 
   <!-- 01 CAPA -->
   <section class="slide" data-title="Capa">
@@ -213,7 +264,7 @@
       <h1>Legenda<span style="color:var(--cap)">Viva</span></h1>
       <p class="lead">Transforma fala em legenda ao vivo — e em Libras — direto no navegador. Sem instalar. Sem login. A audiência só abre o link.</p>
       <div class="mt">
-        <span class="caption-bar"><span id="typed"></span><span class="cursor"></span></span>
+        <span class="caption-bar"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="typed"></span><span class="cursor"></span></span>
       </div>
       <div class="row mt">
         <span class="pill"><span class="dot"></span>No ar em produção</span>
@@ -271,7 +322,7 @@
         <div class="card"><span class="ico">🤟</span><h3>4 · Ligar Libras</h3><p>Ativar o avatar VLibras na tela da audiência.</p></div>
       </div>
       <div class="row mt">
-        <span class="pill cap">▶ legendaviva-ifrn.duckdns.org</span>
+        <a class="pill cap" href="https://legendaviva-ifrn.duckdns.org" target="_blank" rel="noopener" aria-label="Abrir o app LegendaViva em produção (nova aba)">▶ legendaviva-ifrn.duckdns.org</a>
         <span class="hint" style="color:var(--muted)">Palestrante em Chrome/Edge · liberar o microfone na 1ª vez</span>
       </div>
     </div>
@@ -424,17 +475,28 @@
   <section class="slide" data-title="Obrigado">
     <div class="slide__inner">
       <div class="eyebrow">Obrigado</div>
-      <h1>Legenda para<br><span style="color:var(--cap)">todo mundo.</span></h1>
-      <p class="lead">Acessibilidade não é um detalhe; é o direito de existir no mesmo mundo que todos os outros.</p>
-      <div class="row mt">
-        <span class="pill cap">▶ legendaviva-ifrn.duckdns.org</span>
-        <span class="pill"><span class="dot"></span>No ar agora</span>
+      <h2 class="display">Legenda para<br><span style="color:var(--cap)">todo mundo.</span></h2>
+      <div class="grid g2 mt" style="align-items:center">
+        <div>
+          <p class="lead" style="margin-top:0">Acessibilidade não é um detalhe; é o direito de existir no mesmo mundo que todos os outros.</p>
+          <div class="row mt-s" style="margin-top:clamp(16px,2.2vw,24px)">
+            <a class="pill cap" href="https://legendaviva-ifrn.duckdns.org" target="_blank" rel="noopener" aria-label="Abrir o app LegendaViva em produção (nova aba)">▶ legendaviva-ifrn.duckdns.org</a>
+            <span class="pill"><span class="dot"></span>No ar agora</span>
+          </div>
+          <p class="mt-s" style="color:var(--muted); font-size:clamp(13px,1.4vw,15px)">Sem instalar · sem login · abre em qualquer navegador.</p>
+          <p class="kicker mt-s" style="color:var(--dim)">Perguntas?</p>
+        </div>
+        <div class="qrbox">
+          <div class="qrcard">
+            <svg viewBox="0 0 33 33" aria-hidden="true"><path fill="none" stroke="currentColor" d="M2 2.5h7m4 0h2m1 0h1m1 0h1m2 0h1m2 0h7m-29 1h1m5 0h1m3 0h3m2 0h1m6 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m5 0h1m2 0h1m1 0h4m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h2m1 0h2m1 0h1m2 0h2m2 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h2m3 0h5m3 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m1 0h5m2 0h1m1 0h3m2 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-20 1h2m2 0h1m2 0h2m-18 1h1m2 0h1m1 0h2m1 0h1m1 0h1m3 0h1m3 0h2m1 0h1m1 0h1m-22 1h4m2 0h2m2 0h2m2 0h1m3 0h3m2 0h1m2 0h1m-28 1h3m2 0h1m2 0h2m1 0h3m1 0h2m1 0h1m1 0h7m-24 1h1m2 0h1m1 0h1m3 0h1m2 0h1m2 0h1m1 0h3m2 0h2m-28 1h5m1 0h1m1 0h1m1 0h3m1 0h4m1 0h4m2 0h1m1 0h2m-28 1h3m1 0h1m2 0h2m1 0h1m1 0h2m2 0h1m1 0h1m1 0h1m-22 1h1m3 0h4m1 0h1m1 0h4m1 0h2m2 0h3m2 0h4m-28 1h1m1 0h1m7 0h1m4 0h2m1 0h1m1 0h1m3 0h1m1 0h1m-28 1h4m2 0h4m3 0h1m1 0h1m1 0h1m1 0h3m5 0h1m-27 1h1m1 0h3m3 0h2m2 0h2m3 0h1m2 0h3m1 0h1m2 0h1m-29 1h1m1 0h1m3 0h1m1 0h4m2 0h1m5 0h1m1 0h3m2 0h2m-26 1h1m3 0h1m1 0h2m1 0h1m1 0h1m1 0h5m1 0h1m4 0h2m-29 1h1m1 0h2m2 0h3m2 0h2m7 0h5m1 0h1m-19 1h1m1 0h1m3 0h1m1 0h2m2 0h1m3 0h1m1 0h3m-29 1h7m2 0h1m1 0h2m4 0h2m1 0h1m1 0h1m1 0h1m2 0h1m-28 1h1m5 0h1m1 0h2m1 0h2m1 0h1m1 0h1m1 0h1m1 0h1m3 0h4m-28 1h1m1 0h3m1 0h1m4 0h1m3 0h3m2 0h5m2 0h2m-29 1h1m1 0h3m1 0h1m1 0h6m5 0h1m2 0h6m-28 1h1m1 0h3m1 0h1m2 0h2m3 0h1m1 0h1m1 0h1m1 0h2m2 0h3m1 0h1m-29 1h1m5 0h1m2 0h1m1 0h1m1 0h8m2 0h1m3 0h1m-28 1h7m1 0h3m2 0h1m3 0h1m2 0h1m1 0h2m1 0h1m1 0h1"/></svg>
+          </div>
+          <span class="qrlbl">Aponte a câmera —<br>abra o app <b style="color:var(--text)">agora</b> no seu celular</span>
+        </div>
       </div>
-      <p class="kicker mt-s" style="color:var(--dim)">Perguntas?</p>
     </div>
   </section>
 
-</div>
+</main>
 
 <canvas id="intro" aria-label="Abertura animada — clique para pular"></canvas>
 
@@ -457,6 +519,7 @@
   var n = slides.length, i = 0;
   var progress = document.getElementById('progress');
   var curEl = document.getElementById('cur');
+  var liveEl = document.getElementById('live');
   var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   document.getElementById('tot').textContent = String(n).padStart(2,'0');
 
@@ -471,6 +534,7 @@
     });
     progress.style.width = (n<2?100:(i/(n-1))*100) + '%';
     curEl.textContent = pad(i);
+    if(liveEl){ liveEl.textContent = 'Slide '+(i+1)+' de '+n+': '+(slides[i].getAttribute('data-title')||''); }
     if(location.hash !== '#'+(i+1)) history.replaceState(null,'','#'+(i+1));
     if(i===0) typeCaption();
   }
