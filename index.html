@@ -396,7 +396,7 @@
     </div>
   </section>
 
-  <!-- 07 IA NO DEV -->
+  <!-- 08 IA NO DEV -->
   <section class="slide" data-title="IA no desenvolvimento">
     <div class="slide__inner">
       <div class="eyebrow">Como usamos IA para desenvolver</div>
@@ -416,7 +416,7 @@
     </div>
   </section>
 
-  <!-- 08 TESTES -->
+  <!-- 09 TESTES -->
   <section class="slide" data-title="Testes & Qualidade">
     <div class="slide__inner">
       <div class="eyebrow">Testes &amp; qualidade</div>
@@ -430,7 +430,7 @@
     </div>
   </section>
 
-  <!-- 09 DEPLOY -->
+  <!-- 10 DEPLOY -->
   <section class="slide" data-title="Deploy & Acessibilidade">
     <div class="slide__inner">
       <div class="eyebrow cy">Publicado &amp; acessível</div>
@@ -449,7 +449,7 @@
     </div>
   </section>
 
-  <!-- 10 STACK / DOMÍNIO -->
+  <!-- 11 STACK / DOMÍNIO -->
   <section class="slide" data-title="Stack & Números">
     <div class="slide__inner">
       <div class="eyebrow">Domínio do código</div>
@@ -471,7 +471,7 @@
     </div>
   </section>
 
-  <!-- 11 ENCERRAMENTO -->
+  <!-- 12 ENCERRAMENTO -->
   <section class="slide" data-title="Obrigado">
     <div class="slide__inner">
       <div class="eyebrow">Obrigado</div>
@@ -505,7 +505,7 @@
 </div>
 
 <div class="chrome" id="botright">
-  <span class="counter"><b id="cur">01</b> / <span id="tot">11</span></span>
+  <span class="counter"><b id="cur">01</b> / <span id="tot">12</span></span>
   <div class="nav">
     <button id="prev" aria-label="Slide anterior">‹</button>
     <button id="next" aria-label="Próximo slide">›</button>
@@ -538,7 +538,7 @@
     if(location.hash !== '#'+(i+1)) history.replaceState(null,'','#'+(i+1));
     if(i===0) typeCaption();
   }
-  function render(){ paint(); }
+  function render(){ useVT(paint); }
   function go(d){ var t=Math.min(Math.max(i+d,0),n-1); if(t!==i){ i=t; render(); } }
   function to(x){ var t=Math.min(Math.max(x,0),n-1); if(t!==i){ i=t; render(); } }
 
