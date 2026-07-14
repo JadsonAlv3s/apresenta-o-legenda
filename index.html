@@ -422,11 +422,11 @@
       <div class="eyebrow">Testes &amp; qualidade</div>
       <h2>Qualidade verificada em cada camada.</h2>
       <div class="grid g3 mt">
-        <div class="card"><h3>Backend</h3><p>Testes de API (health, sessões) com pytest — contratos e regras de sessão.</p></div>
-        <div class="card"><h3>CI no GitHub Actions</h3><p>Lint + build do frontend e lint + testes do backend a cada push.</p></div>
-        <div class="card"><h3>Fluxo do usuário</h3><p>Validação ponta-a-ponta em produção: criar sessão → QR → legenda → Libras.</p></div>
+        <div class="card"><h3>Unitários (pytest)</h3><p>Lógica de negócio core: sessões, tradução (cache LRU + <b>fallback</b>) e <b>broadcast</b> em tempo real.</p></div>
+        <div class="card"><h3>E2E (Playwright)</h3><p>Fluxos do usuário, incluindo o pipeline real-time: palestrante fala → legenda chega à audiência <b>via WebSocket</b>.</p></div>
+        <div class="card"><h3>CI no GitHub Actions</h3><p>Lint + build do frontend e lint + testes (API, E2E, k6) do backend a cada push.</p></div>
       </div>
-      <div class="note mt"><b>Transparência:</b> a cobertura automatizada está concentrada na API; os fluxos de UI e WebSocket foram validados manualmente. Próximo passo declarado: testes E2E (Playwright) e unitários de frontend.</div>
+      <div class="note mt"><b>Transparência:</b> a cobertura automatizada está no backend (unitários + E2E de API e WebSocket). Próximo passo declarado: testes unitários de frontend.</div>
     </div>
   </section>
 
